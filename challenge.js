@@ -1,3 +1,5 @@
+const fs = require("fs");
+
 let users = [];
 let companies = [];
 
@@ -50,7 +52,54 @@ sortedCompanies.map((company) => {
     if (user.active_status === true && company.id === user.company_id) {
       if (company.email_status === false || user.email_status === false)
         company.users_not_emailed.push(user);
-    } else if (company.email_status === true && user.email_status === true)
-      company.users_emailed.push(user);
+      else if (company.email_status === true && user.email_status === true)
+        company.users_emailed.push(user);
+    }
   });
+});
+
+/**
+ * Write to output file synchronously
+ */
+let data = "";
+for (let company of sortedCompanies) {
+  let users_emailed_data = "";
+  let users_not_emailed_data = "";
+  company.users_emailed.map((user) => {
+    users_emailed_data += `\n\t\t${user.last_name}, ${user.first_name}, ${
+      user.email
+    }\n\t\t  Previous Token Balance, ${user.tokens}\n\t\t  New Token Balance ${
+      user.tokens + company.top_up
+    }`;
+  });
+  company.users_not_emailed.map((user) => {
+    users_not_emailed_data += `\n\t\t${user.last_name}, ${user.first_name}, ${
+      user.email
+    }\n\t\t  Previous Token Balance, ${user.tokens}\n\t\t  New Token Balance ${
+      user.tokens + company.top_up
+    }`;
+  });
+  if (
+    company.users_emailed.length === 0 &&
+    company.users_not_emailed.length === 0
+  ) {
+    continue;
+  }
+  data += `\n\tCompany Id: ${company.id}\n\tCompany Name: ${
+    company.name
+  }\n\tUsers Emailed: ${users_emailed_data}\n\tUsers Not Emailed: ${users_not_emailed_data}\n\t\tTotal amount of top ups for ${
+    company.name
+  }: ${
+    (company.users_emailed.length + company.users_not_emailed.length) *
+    company.top_up
+  }\n`;
+}
+
+fs.writeFile("./output.txt", data, (err) => {
+  if (err) console.log(err);
+  else {
+    console.log("File written successfully\n");
+    console.log("The written has the following contents:");
+    console.log(fs.readFileSync("output.txt", "utf8"));
+  }
 });
