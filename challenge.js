@@ -3,6 +3,9 @@ const fs = require("fs");
 let users = [];
 let companies = [];
 
+/**
+ * Use try block to catch faulty JSON data
+ */
 try {
   users = require("./users.json");
 } catch (e) {
@@ -63,8 +66,8 @@ sortedCompanies.map((company) => {
  */
 let data = "";
 for (let company of sortedCompanies) {
-  let users_emailed_data = "";
-  let users_not_emailed_data = "";
+  let users_emailed_data = ""; //set new key to store emailed users
+  let users_not_emailed_data = ""; // set new key to store users not emailed
   company.users_emailed.map((user) => {
     users_emailed_data += `\n\t\t${user.last_name}, ${user.first_name}, ${
       user.email
@@ -83,7 +86,7 @@ for (let company of sortedCompanies) {
     company.users_emailed.length === 0 &&
     company.users_not_emailed.length === 0
   ) {
-    continue;
+    continue; //skip if no active users
   }
   data += `\n\tCompany Id: ${company.id}\n\tCompany Name: ${
     company.name
@@ -98,8 +101,8 @@ for (let company of sortedCompanies) {
 fs.writeFile("./output.txt", data, (err) => {
   if (err) console.log(err);
   else {
-    console.log("File written successfully\n");
+    console.log("File output.txt written successfully\n");
     console.log("The written has the following contents:");
-    console.log(fs.readFileSync("output.txt", "utf8"));
+    console.log(fs.readFileSync("output.txt", "utf8")); //Output of file to console
   }
 });
